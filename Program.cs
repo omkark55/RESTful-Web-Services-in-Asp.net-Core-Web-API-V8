@@ -64,7 +64,7 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "CRM API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Employee API", Version = "v1" });
 
     // Add BranchId as a header
     c.AddSecurityDefinition("TenantHeader", new OpenApiSecurityScheme
@@ -75,12 +75,12 @@ builder.Services.AddSwaggerGen(c =>
         Description = "Tenant ID used to route to the correct client database"
     });
 
-    c.AddSecurityDefinition("CompanyCharHeader", new OpenApiSecurityScheme
+    c.AddSecurityDefinition("BranchCharHeader", new OpenApiSecurityScheme
     {
         Name = "TreeId",
         Type = SecuritySchemeType.ApiKey,
         In = ParameterLocation.Header,
-        Description = "CompanyCharId ID to idnetify company"
+        Description = "BranchCharId ID to idnetify main tree"
     });
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
@@ -119,7 +119,7 @@ builder.Services.AddSwaggerGen(c =>
                 Reference = new OpenApiReference
                 {
                     Type = ReferenceType.SecurityScheme,
-                    Id = "CompanyCharHeader"
+                    Id = "BranchCharHeader"
                 }
             },
             new string[] {}
