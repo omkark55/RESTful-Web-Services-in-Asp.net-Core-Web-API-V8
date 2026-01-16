@@ -16,28 +16,16 @@ namespace WebApi_Angular.DBContext
         public PracticeDbContext(DbContextOptions<PracticeDbContext> options): base(options)
         {
 
-             
-
         }
 
         public virtual DbSet<Employee> Employee { get; set; }
 
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
-            modelBuilder.HasDefaultSchema("dbo");//map to default schema in SQL server
-            //modelBuilder.RemovePluralizingTableNameConvention();
+            modelBuilder.HasDefaultSchema("dbo");
             modelBuilder.Entity<Employee>().HasQueryFilter(z => !z.IsDeleted);
-           
         }
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-
-        //    optionsBuilder.UseSqlServer("PracticeContext");
-        //    optionsBuilder.UseLazyLoadingProxies(false);
-        //    base.OnConfiguring(optionsBuilder);
-        //}
+      
 
     }
 }
