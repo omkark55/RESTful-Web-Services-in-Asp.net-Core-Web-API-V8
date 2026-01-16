@@ -20,11 +20,7 @@ namespace WebApi_Angular.Controllers
         PracticeRepository _globalDBContext;
         PracticeRepository practiceReposiory;
         WebApi_Angular.DBContext.PracticeDbContext practiceDbContext;
-        //public PracticeController(PracticeDbContext dbContext, PracticeRepository practiceRepository)
-        //{
-        //    practiceDbContext = dbContext;
-        //    practiceReposiory = practiceRepository;
-        //}   
+      
         public PracticeController( PracticeRepository practiceRepository)
         {
             practiceReposiory = practiceRepository;
@@ -59,18 +55,14 @@ namespace WebApi_Angular.Controllers
                 SetTenantDetails();
 
                 string modelNamespace = $"WebApi_Angular.Models.{domainModelName}";
-                // string repositoryNamespace = "WebApi_Angular.Repository.PracticeRepository";
                 string brokerNamespace = $"WebApi_Angular.Service.{domainModelName}Broker"; //WebApi_Angular.Service.WebApi_Angular.Models.EmployeeBroker
-
 
                 Type brokerType = Type.GetType($"{brokerNamespace}");
                 if (brokerType == null || brokerType == null)
                     return BadRequest("Broker not found.");
-
-                // Deserialize parameter into object matching the model
+              
                 dynamic paramObject = JsonConvert.DeserializeObject(parameter);
 
-                //object repositoryInstance = Activator.CreateInstance(brokerType, true);
                 object repositoryInstance = ActivatorUtilities.CreateInstance(HttpContext.RequestServices, brokerType);
 
                 MethodInfo getMethod = brokerType.GetMethod("GetAll");
@@ -78,9 +70,6 @@ namespace WebApi_Angular.Controllers
                     return BadRequest("Get method not found in broker");
 
                 var result = getMethod.Invoke(repositoryInstance, new object[] { paramObject });
-
-                //PracticeRepository practiceRepository = new PracticeRepository(practiceDbContext);
-                // var result = practiceReposiory.GetAll(paramObject);
 
                 return Ok(result);
                 
@@ -91,15 +80,11 @@ namespace WebApi_Angular.Controllers
             }
             finally
             {
-                //if (DbContext?.Database.GetDbConnection().State == System.Data.ConnectionState.Open)
-                //    DbContext.Database.GetDbConnection().Close();
-                //DbContext?.Dispose();
+              
                 if (practiceReposiory is IDisposable disposable)
                 {
                     disposable.Dispose();
                 }
-         
-                
             }
         }
         [ResponseCache(NoStore = true, Duration = 0, VaryByHeader = "None")]
@@ -123,15 +108,9 @@ namespace WebApi_Angular.Controllers
             try
             {
                 SetTenantDetails();
-
-                //string modelNamespace = $"RichtechIT.CRM.Domain.MultiTenant.{domainModelName}";
-                //string brokerNamespace = $"RichtechIT.CRM.Business.MultiTenant.{domainModelName}Broker";
+               
                 string modelNamespace = $"WebApi_Angular.Models.{domainModelName}";
                 string brokerNamespace = $"WebApi_Angular.Service.{domainModelName}Broker";
-
-
-                //Type modelType = Type.GetType($"{modelNamespace}, RichtechIT.CRM.Domain");
-                //Type brokerType = Type.GetType($"{brokerNamespace}, RichtechIT.CRM.Business");
 
                 Type modelType = Type.GetType($"{modelNamespace}");
                 Type brokerType = Type.GetType($"{brokerNamespace}");
@@ -142,26 +121,15 @@ namespace WebApi_Angular.Controllers
                 if (!domainModelData.TryGetProperty("Model", out JsonElement modelElement))
                     return BadRequest("Missing 'Model'");
 
-                //--------------Multitenant-------------
-                //_MasterDbContext ??= Utilities.GetDataContext(Utilities.MasterConfigDatabaseName, domainModelName);
-                //ClientDbContextFactory _factory = new ClientDbContextFactory(_MasterDbContext as RTMasterConfigDataContext);
-                //ClientDBContext _clientContext = _factory.CreateClientContext(BranchId, TreeId);
-                //-------------------------------------------
-
-                //Step 4: Create broker instance and invoke Add method
-                //object brokerInstance = _clientContext == null
-                //    ? Activator.CreateInstance(brokerType)
-                //    : Activator.CreateInstance(brokerType, _clientContext);
-
                 object brokerInstance = ActivatorUtilities.CreateInstance(HttpContext.RequestServices, brokerType);
-                //For regular single object save 
+              
                 object modelInstance = null;
 
                 if (!bBulkSave)
                 {
                     modelInstance = JsonConvert.DeserializeObject(modelElement.GetRawText(), modelType);
                 }
-                //For bulk insert save
+              
                 else
                 {
                     modelInstance = JsonConvert.SerializeObject(modelElement.GetRawText());
@@ -175,7 +143,6 @@ namespace WebApi_Angular.Controllers
                 }
                 else
                 {
-                    // 2) Extract the "Model" property (which is the array of records)
                     MethodInfo addAllMethod = brokerType.GetMethod("AddAll");
                     result = addAllMethod?.Invoke(brokerInstance, new object[] { domainModelData });
                 }
@@ -212,7 +179,6 @@ namespace WebApi_Angular.Controllers
                 string modelNamespace = $"WebApi_Angular.Models.{domainModelName}";
                 string brokerNamespace = $"WebApi_Angular.Service.{domainModelName}Broker"; 
 
-
                 Type modelType = Type.GetType($"{modelNamespace}");
                 Type brokerType = Type.GetType($"{brokerNamespace}");
 
@@ -223,15 +189,7 @@ namespace WebApi_Angular.Controllers
                     return BadRequest("Missing 'Model'");
 
                 object domainModelInstance = JsonConvert.DeserializeObject(modelElement.GetRawText(), modelType);
-
-
-                //--------------Multitenant-------------
-                //_MasterDbContext ??= Utilities.GetDataContext(Utilities.MasterConfigDatabaseName, domainModelName);
-                //ClientDbContextFactory _factory = new ClientDbContextFactory(_MasterDbContext as RTMasterConfigDataContext);
-                //ClientDBContext _clientContext = _factory.CreateClientContext(BranchId, TreeId);
-                //-------------------------------------------
-
-                //Step 4: Create broker instance and invoke Add method
+              
                 object brokerInstance = ActivatorUtilities.CreateInstance(HttpContext.RequestServices, brokerType);
 
                 MethodInfo editMethod = brokerType.GetMethod("Edit");
@@ -287,15 +245,7 @@ namespace WebApi_Angular.Controllers
                     return BadRequest("Missing 'Model'");
 
                 object domainModelInstance = JsonConvert.DeserializeObject(modelElement.GetRawText(), modelType);
-
-
-                //--------------Multitenant------------ -
-                //_MasterDbContext ??= Utilities.GetDataContext(Utilities.MasterConfigDatabaseName, domainModelName);
-                //ClientDbContextFactory _factory = new ClientDbContextFactory(_MasterDbContext as RTMasterConfigDataContext);
-                //ClientDBContext _clientContext = _factory.CreateClientContext(BranchId, TreeId);
-                //-------------------------------------------
-
-                //Step 4: Create broker instance and invoke Add method
+               
                  object brokerInstance = ActivatorUtilities.CreateInstance(HttpContext.RequestServices, brokerType);
 
                 MethodInfo deleteMethod = brokerType.GetMethod("Delete");
@@ -322,9 +272,6 @@ namespace WebApi_Angular.Controllers
                 }
             }
         }
-        //public IActionResult Index()
-        //{
-        //    return View();
-        //}
+      
     }
 }
