@@ -7,7 +7,5 @@
         public dynamic Result { get; set; }
         public string Message { get; set; }
 
-        //public DataPager Pager { get; set; }
-
     }
 }
