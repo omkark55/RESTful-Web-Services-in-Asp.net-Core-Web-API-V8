@@ -13,11 +13,8 @@ namespace WebApi_Angular.Service
         #region Data members and properties
         PracticeDbContext _DbContext = null;
         private PracticeRepository practiceRepository { get; set; }
-        // PracticeRepository practiceRepository = new PracticeRepository();
         private WebApi_Angular.Models.Employee _Employee = null;
-        
         #endregion
-
 
         #region Constructors
         public EmployeeBroker()
@@ -37,13 +34,6 @@ namespace WebApi_Angular.Service
         #region Methods and functions
         public ResponseResult GetAll(dynamic parameters)
         {
-            //return new Common.ResponseResult
-            //{
-            //    Message = AppMessages.ResponseCodes.OK.ToString(),
-            //    Status = Common.ResultStatus.SUCCESS,
-            //    StatusCode = AppMessages.ResponseCodes.OK.GetHashCode(),
-            //    Result = RepositoryIndustryMaster.GetAll(parameters, userInfo)
-            //};
             Type type = parameters.GetType();
             PropertyInfo propertyInfo = type.GetProperty("ListType");
              string lstType= parameters["Model"]?["ListType"]?.ToString();
@@ -61,9 +51,6 @@ namespace WebApi_Angular.Service
             {
                  
                 response.Result = practiceRepository.GetAll(parameters);
-             
-                //response.Result = RepositoryIndustryMaster.GetAllWithSP(parameters, userInfo); /// for sp pagination
-                // response.Pager = PracticeRepository.pager;
                 response.Message = "ok";
                 response.Status = "SUCCESS";
                 response.StatusCode = 201;
@@ -89,19 +76,14 @@ namespace WebApi_Angular.Service
 
             return new ResponseResult
             {
-                //Message = AppMessages.ResponseCodes.OK.ToString(),
                 Message = "Record Saved Successfully",
                 Status = "ok",
                 StatusCode = 200,
-                //Result = _IndustryMaster.EntityId
             };
         }
         public ResponseResult Edit(Employee domainModel)
         {
-            // Step 1: Fetch the existing entity using PlotNumber (Later shift to EntityId)
             var existingEmployee = practiceRepository.GetEntity(domainModel);
-            //var existingIndustry = RepositoryIndustryMaster.Get(x => x.EntityId == domainModel.EntityId);
-
             if (existingEmployee == null)
             {
                 return new ResponseResult
@@ -113,7 +95,6 @@ namespace WebApi_Angular.Service
                 };
             }
 
-            // Step 2: Update only changed fields
             existingEmployee.Name = domainModel.Name;
             existingEmployee.Id = domainModel.Id;
             existingEmployee.Gender = domainModel.Gender;
@@ -121,7 +102,6 @@ namespace WebApi_Angular.Service
             existingEmployee.Department = domainModel.Department;
             existingEmployee.RecordUptoDate = DateTime.Now;
 
-            // Step 3: Save
           var res=  practiceRepository.UpdateEntity(existingEmployee);
             if(res.StatusCode==200){
             return new ResponseResult
@@ -129,7 +109,6 @@ namespace WebApi_Angular.Service
                 Message = "Record Updated Successfully",
                 Status = "Ok",
                 StatusCode = res.StatusCode,
-                //Result = existingIndustry.EntityId
             };
            }
             else
@@ -139,7 +118,6 @@ namespace WebApi_Angular.Service
                     Message = "Record not updated",
                     Status = "Fail",
                     StatusCode = res.StatusCode,
-                    //Result = existingIndustry.EntityId
                 };
             }
         }
@@ -168,8 +146,6 @@ namespace WebApi_Angular.Service
                 };
             }
         }
-
-
 
         #endregion Methods and functions
 
