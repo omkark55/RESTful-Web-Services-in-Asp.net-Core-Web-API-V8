@@ -51,7 +51,7 @@ namespace WebApi_Angular.Controllers
         }
         [HttpGet("Get")]
         [Route("api/web/client/{domainModelName}/{parameter?}/get")]
-        public IActionResult Get(string domainModelName, string parameter = "")
+        public async Task<IActionResult> Get(string domainModelName, string parameter = "")
         {
             Stopwatch watch = Stopwatch.StartNew();
 
@@ -74,7 +74,21 @@ namespace WebApi_Angular.Controllers
                 if (getMethod == null)
                     return BadRequest("Get method not found in broker");
 
-                var result = getMethod.Invoke(repositoryInstance, new object[] { paramObject });
+                 var invokeResult = getMethod.Invoke(repositoryInstance, new object[] { paramObject });
+
+ object result;
+
+ if (invokeResult is Task task)
+ {
+     await task.ConfigureAwait(false);
+
+     var resultProperty = task.GetType().GetProperty("Result");
+     result = resultProperty?.GetValue(task);
+ }
+ else
+ {
+     result = invokeResult;
+ }
 
                 return Ok(result);
                 
@@ -95,7 +109,7 @@ namespace WebApi_Angular.Controllers
         [ResponseCache(NoStore = true, Duration = 0, VaryByHeader = "None")]
         [HttpPost("post")]
         [Route("api/web/client/{domainModelName}/{parameter?}/post")]
-        public IActionResult Post(string domainModelName, [FromBody] JsonElement domainModelData)
+        public async Task<IActionResult> Post(string domainModelName, [FromBody] JsonElement domainModelData)
         {
             Stopwatch watch = Stopwatch.StartNew();
             bool bBulkSave = false;
@@ -103,7 +117,7 @@ namespace WebApi_Angular.Controllers
             if (domainModelData.TryGetProperty("postType", out JsonElement postTypeElement) &&
                 postTypeElement.GetString()?.Equals("Get", StringComparison.OrdinalIgnoreCase) == true)
             {
-                return Get(domainModelName, domainModelData.ToString());
+                return await Get(domainModelName, domainModelData.ToString());
             }
             if (domainModelData.TryGetProperty("postType", out JsonElement postTypeSaveElement) &&
               postTypeElement.GetString()?.Equals("BulkSave", StringComparison.OrdinalIgnoreCase) == true)
@@ -173,7 +187,7 @@ namespace WebApi_Angular.Controllers
         [Route("api/web/client/{domainModelName}/{parameter?}/post")]
         [Authorize(Roles = "developer")]
         [HttpPut]
-        public IActionResult Put(string domainModelName, [FromBody] JsonElement domainModelData)
+        public async Task<IActionResult> Put(string domainModelName, [FromBody] JsonElement domainModelData)
         {
 
             Stopwatch watch = Stopwatch.StartNew();
@@ -202,7 +216,21 @@ namespace WebApi_Angular.Controllers
                 if (editMethod == null)
                     return BadRequest("Edit method not found in broker");
 
-                var result = editMethod.Invoke(brokerInstance, new object[] { domainModelInstance });
+                var invokeResult = editMethod.Invoke(brokerInstance, new object[] { domainModelInstance });
+
+object result;
+
+if (invokeResult is Task task)
+{
+    await task.ConfigureAwait(false);
+    
+    var resultProperty = task.GetType().GetProperty("Result");
+    result = resultProperty?.GetValue(task);
+}
+else
+{
+    result = invokeResult;
+}
 
                 return Ok(result);
             }
