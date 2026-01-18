@@ -32,7 +32,7 @@ namespace WebApi_Angular.Service
 
 
         #region Methods and functions
-        public ResponseResult GetAll(dynamic parameters)
+        public async Task<ResponseResult> GetAll(dynamic parameters)
         {
             Type type = parameters.GetType();
             PropertyInfo propertyInfo = type.GetProperty("ListType");
@@ -41,7 +41,7 @@ namespace WebApi_Angular.Service
             if (lstType == "GetById")
             {
                 int id = Convert.ToInt32(parameters["Model"]?["Id"]);
-                response.Result = practiceRepository.GetById(id);
+                response.Result = await practiceRepository.GetById(id);
                 response.Message = "ok";
                 response.Status = "SUCCESS";
                 response.StatusCode = 201;
@@ -50,7 +50,7 @@ namespace WebApi_Angular.Service
             else
             {
                  
-                response.Result = practiceRepository.GetAll(parameters);
+                response.Result = await practiceRepository.GetAll(parameters);
                 response.Message = "ok";
                 response.Status = "SUCCESS";
                 response.StatusCode = 201;
@@ -81,9 +81,9 @@ namespace WebApi_Angular.Service
                 StatusCode = 200,
             };
         }
-        public ResponseResult Edit(Employee domainModel)
+        public Task<ResponseResult> Edit(Employee domainModel)
         {
-            var existingEmployee = practiceRepository.GetEntity(domainModel);
+            var existingEmployee = await practiceRepository.GetEntity(domainModel);
             if (existingEmployee == null)
             {
                 return new ResponseResult
@@ -102,7 +102,7 @@ namespace WebApi_Angular.Service
             existingEmployee.Department = domainModel.Department;
             existingEmployee.RecordUptoDate = DateTime.Now;
 
-          var res=  practiceRepository.UpdateEntity(existingEmployee);
+          var res= await practiceRepository.UpdateEntity(existingEmployee);
             if(res.StatusCode==200){
             return new ResponseResult
             {
