@@ -24,7 +24,7 @@ namespace WebApi_Angular.Repository
             memoryCache = cache ?? throw new ArgumentNullException("not cached");
         }
 
-        public IEnumerable<Employee> GetAll(dynamic parameters)
+        public async Task<IEnumerable<Employee>> GetAll(dynamic parameters)
         {
             try
             {
@@ -64,12 +64,12 @@ namespace WebApi_Angular.Repository
                                  Salary=(int)t1.Salary,
                                  RecordUptoDate = t1.RecordUptoDate
                              });
-                pager.RecordCount = query.Count();
+                pager.RecordCount = await query.CountAsync();
                 
 
-                    var result = query
+                    var result = await query
                     .OrderBy(x => x.Name)
-                    .ToList();
+                     .ToListAsync();
                 var cacheEntryOptions = new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)); // Cache for 5 minutes
 
                 memoryCache.Set(GetAllProductsCacheKey, result, cacheEntryOptions);
@@ -82,7 +82,7 @@ namespace WebApi_Angular.Repository
             }
            
         }
-        public Employee GetById(int id)
+        public async Task<Employee> GetById(int id)
         {
             try
             {
@@ -105,9 +105,9 @@ namespace WebApi_Angular.Repository
                                  RecordUptoDate = t1.RecordUptoDate
                              });
 
-                var result = query
+                var result =  await query
                     .OrderBy(x => x.Name)
-                    .FirstOrDefault();
+                     .FirstOrDefaultAsync();
 
                 return result;
             }
@@ -137,10 +137,10 @@ namespace WebApi_Angular.Repository
             return Get(employee, employee);
         }
 
-        public ResponseResult UpdateEntity(Employee employee)
+        public async Task<ResponseResult> UpdateEntity(Employee employee)
         {
 
-            return Update(employee);
+            return  await Update(employee);
         }
 
         public bool DeleteEntity(int Id)
