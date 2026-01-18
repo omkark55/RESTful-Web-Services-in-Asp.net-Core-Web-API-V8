@@ -39,10 +39,15 @@ namespace WebApi_Angular.Controllers
                 BranchId = headerSubBranchId.FirstOrDefault();
             }
 
-            if (string.IsNullOrEmpty(TreeId) || string.IsNullOrEmpty(BranchId))
-            {
-                throw new Exception("BranchId or TennantId not found");
-            }
+            string Authorization = string.Empty;
+ if (Request.Headers.TryGetValue("Authorization", out var headerBearer))
+ {
+     Authorization = headerBearer.FirstOrDefault();
+ }
+ if (string.IsNullOrEmpty(TreeId) || string.IsNullOrEmpty(BranchId))
+ {
+     throw new Exception("BranchId or TennantId not found");
+ }
         }
         [HttpGet("Get")]
         [Route("api/web/client/{domainModelName}/{parameter?}/get")]
@@ -166,6 +171,7 @@ namespace WebApi_Angular.Controllers
 
         [ResponseCache(NoStore = true, Duration = 0, VaryByHeader = "None")]
         [Route("api/web/client/{domainModelName}/{parameter?}/post")]
+        [Authorize(Roles = "developer")]
         [HttpPut]
         public IActionResult Put(string domainModelName, [FromBody] JsonElement domainModelData)
         {
@@ -221,6 +227,7 @@ namespace WebApi_Angular.Controllers
 
         [ResponseCache(NoStore = true, Duration = 0, VaryByHeader = "None")]
         [Route("api/web/client/{domainModelName}/{parameter?}/post")]
+        [Authorize(Roles = "admin")]
         [HttpDelete]
         public IActionResult Delete(string domainModelName, [FromBody] JsonElement domainModelData)
         {
