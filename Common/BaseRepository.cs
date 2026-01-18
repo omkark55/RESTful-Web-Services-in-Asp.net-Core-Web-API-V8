@@ -38,7 +38,7 @@ namespace WebApi_Angular.Common
             GC.SuppressFinalize(this);
         }
 
-        public ResponseResult Update(TDataEntity entity)
+        public async Task<ResponseResult>  Update(TDataEntity entity)
         {
             if (entity == null)
                 return new ResponseResult { Message = "Entity cannot be null" };
@@ -46,7 +46,7 @@ namespace WebApi_Angular.Common
             _DbContext.Set<TDataEntity>().Attach(entity);
             _DbContext.Entry(entity).State = EntityState.Modified;
 
-            int affected = _DbContext.SaveChanges();
+            int affected = await _DbContext.SaveChanges();
 
             return affected > 0
                 ? new ResponseResult { StatusCode = 200 }
@@ -54,7 +54,7 @@ namespace WebApi_Angular.Common
         }
 
        
-        public TDataEntity Get(dynamic parameters, TDataEntity entity)
+        public Task<TDataEntity> Get(dynamic parameters, TDataEntity entity)
         {
             if (parameters == null)
                 throw new ArgumentNullException(nameof(parameters));
@@ -64,7 +64,7 @@ namespace WebApi_Angular.Common
                 throw new ArgumentException("No property found in parameters");
             var id = Convert.ToInt32(property.GetValue(parameters));
 
-            return _DbContext.Set<TDataEntity>().Find(id);
+            return await _DbContext.Set<TDataEntity>().Find(id);
         }
 
         ResponseResult Delete(TDataEntity entity)
