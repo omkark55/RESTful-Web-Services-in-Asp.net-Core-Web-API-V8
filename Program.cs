@@ -42,7 +42,17 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig["Key"] ?? ""))
     };
 });
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("RequireAdmin", policy =>
+        policy.RequireRole("admin"));
+
+    //options.AddPolicy("RequireDeveloper", policy =>
+    //    policy.RequireClaim("Employee", "developer"));
+
+    options.AddPolicy("RequireDeveloper", policy =>
+       policy.RequireRole("developer"));
+});
 
 builder.Services.AddDbContext<PracticeDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("PracticeContext")).UseLazyLoadingProxies(false));
@@ -82,6 +92,15 @@ builder.Services.AddSwaggerGen(c =>
         In = ParameterLocation.Header,
         Description = "BranchCharId ID to idnetify main tree"
     });
+     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+ {
+     Description = "JWT Authorization header using the Bearer scheme. Example: 'Bearer {token}'",
+     Name = "Authorization",
+     In = ParameterLocation.Header,
+     Type = SecuritySchemeType.Http,
+     Scheme = "bearer",
+     BearerFormat = "JWT"
+ });
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
