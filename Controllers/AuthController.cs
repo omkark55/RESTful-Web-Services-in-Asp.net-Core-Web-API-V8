@@ -35,6 +35,15 @@ namespace WebApi_Angular.Controllers
                 var token = _tokenGenerator.GenerateToken(UserName, "Admin");
                 return Ok(new { Token = token });
             }
+             if (paramObject.Username == "developer" && paramObject.Password == "dev123")
+ {
+     if (paramObject.Username == "developer")
+     {
+         UserName = "developer";
+     }
+     var token = _tokenGenerator.GenerateToken(UserName, "developer");
+     return Ok(new { Token = token });
+ }
 
             return Unauthorized();
         }
